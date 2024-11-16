@@ -32,12 +32,13 @@ namespace BTL_LTW
         }
         protected void btnLogin_Click(object sender, EventArgs e)
         {
+            existAcc.Visible = false;
+            wrongPass.Visible = false;
             string storedPassword = GetUserByUsername(Request["username"]);
             if (storedPassword == null)
             {
                 existAcc.Text = "Tài khoản không tồn tại.";
                 existAcc.Visible = true;
-                return;
             }
             if (VerifyPassword(Request["password"], storedPassword))
             {

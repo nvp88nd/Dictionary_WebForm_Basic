@@ -19,6 +19,10 @@ namespace BTL_LTW
         }
         protected void btnRegister_Click(object sender, EventArgs e)
         {
+            wrongAgainPass.Visible = false;
+            existAcc.Visible = false;
+            ckb_t_p.Visible = false;
+
             string tk = username.Value;
             string mail = email.Value;
             string pass = password.Value;

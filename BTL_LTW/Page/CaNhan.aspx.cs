@@ -30,7 +30,89 @@ namespace BTL_LTW.Page
         }
         protected void btnChangePass_Click(object sender, EventArgs e)
         {
-            
+            mvChangePass.ActiveViewIndex = 1;
+        }
+        protected void btnSubmitChange_Click(object sender, EventArgs e)
+        {
+            wrongpass.Visible = false;
+            wrongpass2.Visible = false;
+
+            string mkc = oldpass.Value;
+            string mkm = newpass.Value;
+            string mkm2 = againnewpass.Value;
+            if(checkPass(mkc))
+            {
+                if(mkm != mkc && mkm == mkm2)
+                {
+                    changePass(mkm);
+                }
+                else if(mkm == mkc)
+                {
+                    wrongpass2.Text = "Mật khẩu mới không được trùng mật khẩu cũ!";
+                    wrongpass2.Visible = true;
+                }
+                else if(mkm != mkm2)
+                {
+                    wrongpass2.Text = "Mật khẩu mới không đúng!";
+                    wrongpass2.Visible = true;
+                }
+            }
+            else
+            {
+                wrongpass.Text = "Mật khẩu không đúng!";
+                wrongpass.Visible = true;
+            }
+        }
+        private void changePass(string v)
+        {
+            if (!string.IsNullOrEmpty(v))
+            {
+                string username = Session["UserName"].ToString();
+                string query = $"update Accounts set pass = '{v}' where username = '{username}'";
+                using (SqlConnection cnn = new SqlConnection(connectionString))
+                {
+                    using (SqlCommand cmd = new SqlCommand(query, cnn))
+                    {
+                        cnn.Open();
+                        int i = cmd.ExecuteNonQuery();
+                            if (i > 0)
+                            {
+                                ClientScript.RegisterStartupScript(this.GetType(), "alert", $"alert('Đổi mật khẩu thành công!');", true);
+                            }
+                            else
+                            {
+                                ClientScript.RegisterStartupScript(this.GetType(), "alert", $"alert('Đổi mật khẩu thất bại!');", true);
+                            }
+                        cnn.Close();
+                    }
+                }
+            }
+        }
+        private bool checkPass(string v)
+        {
+            if (!string.IsNullOrEmpty(v))
+            {
+                string username = Session["UserName"].ToString();
+                string query = $"SELECT * FROM dbo.Accounts where username = '{username}' and pass = '{v}'";
+                using (SqlConnection cnn = new SqlConnection(connectionString))
+                {
+                    using (SqlCommand cmd = new SqlCommand(query, cnn))
+                    {
+                        cnn.Open();
+                        using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                        {
+                            DataTable dt = new DataTable();
+                            sda.Fill(dt);
+                            if (dt.Rows.Count > 0)
+                            {
+                                return true;
+                            }
+                        }
+                        cnn.Close();
+                    }
+                }
+            }
+            return false;
         }
         protected void loadInfo()
         {
@@ -49,9 +131,9 @@ namespace BTL_LTW.Page
                         {
                             profile_item_1.InnerHtml = $@"<strong>Tên tài khoản:</strong> {dt.Rows[0]["username"]}";
                             profile_item_2.InnerHtml = $@"<strong>Email:</strong> {dt.Rows[0]["email"]}";
-                            string type_acc = "Khách";
+                            /*string type_acc = "Khách";
                             if (dt.Rows[0]["account_type"].ToString() != "user") type_acc = "ADMIN";
-                            profile_item_3.InnerHtml = $@"<strong>Loại tài khoản:</strong> {type_acc}";
+                            profile_item_3.InnerHtml = $@"<strong>Loại tài khoản:</strong> {type_acc}";*/
                         }
                     }
                     cnn.Close();
